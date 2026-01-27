@@ -1,0 +1,435 @@
+# STEP 1: Set working directory
+setwd("/Users/chrstnjnn/DataPrep")
+
+# Check working directory
+getwd()
+
+# STEP 3: Load packages
+library(readr)
+library(dplyr)
+library(lubridate)
+
+# STEP 4: Read Mendeley dataset
+dengue_raw <- read_csv("denguecases.csv")
+
+# STEP 6: Standardize column names
+dengue_clean <- dengue_raw
+names(dengue_clean) <- tolower(names(dengue_clean))
+
+setwd("/Users/chrstnjnn/DataPrep")
+library(readr)
+library(dplyr)
+library(lubridate)
+
+dengue_raw <- read_csv("denguecases.csv")
+
+dengue_clean <- dengue_raw
+names(dengue_clean) <- tolower(names(dengue_clean))
+
+# STEP 7: Rename key columns safely
+dengue_clean <- dengue_clean %>%
+  rename(
+    date   = any_of(c("date", "report_date")),
+    region = any_of(c("region", "province")),
+    cases  = any_of(c("cases", "confirmed"))
+  )
+
+      
+dengue_clean <- dengue_clean %>%
+ mutate(
+  date = as.Date(paste(year, month, "01", sep = "-")) %>%
+
+year(dengue_clean$date) %>%
+month(dengue_clean$date)
+filter(dengue_clean, year >= 2019)
+
+# STEP 9: Extract year and month
+dengue_clean <- dengue_clean %>%
+  mutate(
+    year = year(date()),
+    month = month(date())
+  )
+# STEP 10: Filter years
+dengue_clean <- dengue_clean %>%
+  filter(year >= 2019 & year <= 2024)
+
+library(readr)
+
+write_csv(dengue_final, "data/cleaned_dengue.csv")
+
+library(dplyr)
+
+dengue_final <- dengue_clean %>%
+  select(year, month, region, dengue_cases)
+
+# STEP 11: Final dataset (no date column)
+dengue_final <- dengue_clean %>%
+  select(year, month, region, dengue_cases) %>%
+  arrange(year, month)
+
+# Create 'data' folder if it doesn't exist
+if(!dir.exists("data")){
+  dir.create("data")
+}
+write.csv(dengue_clean, "data/cleaned_dengue.csv", row.names = FALSE)
+file.exists("data/cleaned_dengue.csv")
+
+setwd("/Users/chrstnjnn/DataPrep")  # <-- your actual project folder
+getwd()  # verify it changed
+
+dengue_final <- read.csv("data/cleaned_dengue.csv")
+head(dengue_final)
+
+dengue_final <- dengue_final %>%
+  rename(
+    year = any_of(c("Year","year")),
+    month = any_of(c("Month","month")),
+    region = any_of(c("Region","region")),
+    cases = any_of(c("Cases","dengue_cases"))
+  )
+
+# Make sure month is numeric
+dengue_final$month <- as.numeric(dengue_final$month)
+
+unique(dengue_final$month)
+
+# If month is text like "January", "Feb", etc.
+dengue_final <- dengue_final %>%
+  mutate(
+    month = case_when(
+      month %in% c("January", "Jan") ~ 1,
+      month %in% c("February", "Feb") ~ 2,
+      month %in% c("March", "Mar") ~ 3,
+      month %in% c("April", "Apr") ~ 4,
+      month %in% c("May") ~ 5,
+      month %in% c("June", "Jun") ~ 6,
+      month %in% c("July", "Jul") ~ 7,
+      month %in% c("August", "Aug") ~ 8,
+      month %in% c("September", "Sep") ~ 9,
+      month %in% c("October", "Oct") ~ 10,
+      month %in% c("November", "Nov") ~ 11,
+      month %in% c("December", "Dec") ~ 12,
+      TRUE ~ as.numeric(month)  # If already numeric
+    )
+  )
+dengue_final <- dengue_final %>%
+  filter(!is.na(month))
+unique(dengue_final$month)
+
+dengue_final %>% filter(region == "SomeRegionName")
+
+dengue_final$region <- trimws(dengue_final$region)
+
+library(dplyr)
+library(readr)
+
+# Load dataset
+dengue_final <- read_csv("data/cleaned_dengue.csv")
+
+# Standardize column names
+dengue_final <- dengue_final %>%
+  rename(
+    year = any_of(c("Year","year")),
+    month = any_of(c("Month","month")),
+    region = any_of(c("Region","region")),
+    cases = any_of(c("Cases","cases","Total_Cases","Confirmed"))
+  )
+
+# Trim region names
+dengue_final$region <- trimws(dengue_final$region)
+
+# Convert month to numeric (handles text like "Jan", "January")
+dengue_final <- dengue_final %>%
+  mutate(
+    month = case_when(
+      month %in% c("January","Jan") ~ 1,
+      month %in% c("February","Feb") ~ 2,
+      month %in% c("March","Mar") ~ 3,
+      month %in% c("April","Apr") ~ 4,
+      month %in% c("May") ~ 5,
+      month %in% c("June","Jun") ~ 6,
+      month %in% c("July","Jul") ~ 7,
+      month %in% c("August","Aug") ~ 8,
+      month %in% c("September","Sep") ~ 9,
+      month %in% c("October","Oct") ~ 10,
+      month %in% c("November","Nov") ~ 11,
+      month %in% c("December","Dec") ~ 12,
+      TRUE ~ as.numeric(month)
+    )
+  )
+
+# Convert cases to numeric
+dengue_final$cases <- as.numeric(dengue_final$cases)
+
+# Remove rows with missing month or cases
+dengue_final <- dengue_final %>% filter(!is.na(month) & !is.na(dengue_cases))
+
+# Quick check
+glimpse(dengue_final)
+
+library(ggplot2)
+
+# Pick one region
+test_region <- unique(dengue_final$region)[1]
+test_data <- dengue_final %>% filter(region == test_region)
+
+ggplot(test_data, aes(x = month, y = dengue_cases, group = year, color = factor(year))) +
+  geom_line() +
+  geom_point()
+
+library(readr)
+library(dplyr)
+
+dengue_final <- read_csv("data/cleaned_dengue.csv")
+
+# Check column names
+colnames(dengue_final)
+
+# Check first few rows
+head(dengue_final)
+
+# Check structure
+str(dengue_final)
+
+dengue_final <- dengue_final %>%
+  rename(
+    year = any_of(c("Year", "year")),
+    month = any_of(c("Month", "month", "month_name")),
+    region = any_of(c("Region", "region", "Province")),
+    dengue_cases = any_of(c("Cases", "cases", "Total_Cases", "Confirmed"))
+  )
+colnames(dengue_final)
+# Check month values
+unique(dengue_final$month)
+
+# Check dengue_cases values
+unique(dengue_final$dengue_cases)
+
+# Only run this after confirming month exists
+if("month" %in% colnames(dengue_final)) {
+  dengue_final <- dengue_final %>%
+    mutate(
+      month = case_when(
+        month %in% c("January","Jan") ~ 1,
+        month %in% c("February","Feb") ~ 2,
+        month %in% c("March","Mar") ~ 3,
+        month %in% c("April","Apr") ~ 4,
+        month %in% c("May") ~ 5,
+        month %in% c("June","Jun") ~ 6,
+        month %in% c("July","Jul") ~ 7,
+        month %in% c("August","Aug") ~ 8,
+        month %in% c("September","Sep") ~ 9,
+        month %in% c("October","Oct") ~ 10,
+        month %in% c("November","Nov") ~ 11,
+        month %in% c("December","Dec") ~ 12,
+        TRUE ~ as.numeric(month)  # converts numeric text
+      )
+    )
+}
+if("cases" %in% colnames(dengue_final)) {
+  dengue_final <- dengue_final %>%
+    mutate(dengue_cases = as.numeric(dengue_cases)) %>%  # converts strings to numbers
+    filter(!is.na(dengue_cases))                  # remove rows with missing cases
+}
+if("region" %in% colnames(dengue_final)) {
+  dengue_final$region <- trimws(dengue_final$region)
+
+  summary(dengue_final)
+  unique(dengue_final$region)
+  library(dplyr)
+  
+dengue_final <- dengue_final %>%
+    rename(
+      year = any_of(c("Year","year","Report_Year","report_year"))
+    )
+dengue_final$year <- as.numeric(dengue_final$year)
+dengue_final <- dengue_final %>% filter(!is.na(year))
+
+min(dengue_final$year)
+max(dengue_final$year)
+
+# Load libraries
+library(readr)
+library(dplyr)
+
+# Load your Mendeley dataset
+dengue_final <- read_csv("data/cleaned_dengue.csv")
+
+# Inspect columns
+colnames(dengue_final)
+head(dengue_final)
+str(dengue_final)
+
+# Rename columns safely
+dengue_final <- dengue_final %>%
+  rename(
+    year = any_of(c("Year","year","Report_Year","report_year")),
+    month = any_of(c("Month","month","month_name")),
+    region = any_of(c("Region","region","Province")),
+    cases = any_of(c("Cases","cases","Total_Cases","Confirmed"))
+  )
+
+# Trim region names
+dengue_final$region <- trimws(dengue_final$region)
+
+# Convert month to numeric (handles text like "Jan")
+dengue_final <- dengue_final %>%
+  mutate(
+    month = case_when(
+      month %in% c("January","Jan") ~ 1,
+      month %in% c("February","Feb") ~ 2,
+      month %in% c("March","Mar") ~ 3,
+      month %in% c("April","Apr") ~ 4,
+      month %in% c("May") ~ 5,
+      month %in% c("June","Jun") ~ 6,
+      month %in% c("July","Jul") ~ 7,
+      month %in% c("August","Aug") ~ 8,
+      month %in% c("September","Sep") ~ 9,
+      month %in% c("October","Oct") ~ 10,
+      month %in% c("November","Nov") ~ 11,
+      month %in% c("December","Dec") ~ 12,
+      TRUE ~ as.numeric(month)
+    )
+  )
+
+# Convert cases to numeric
+dengue_final$dengue_cases <- as.numeric(dengue_final$dengue_cases)
+
+# Convert year to numeric
+dengue_final$year <- as.numeric(dengue_final$year)
+
+# Remove rows with missing values in key columns
+dengue_final <- dengue_final %>%
+  filter(!is.na(month) & !is.na(dengue_cases) & !is.na(year) & !is.na(region))
+
+# Verify clean dataset
+summary(dengue_final)
+
+library(dplyr)
+
+# Convert month names to numeric if necessary
+dengue_final <- dengue_final %>%
+  mutate(
+    month = case_when(
+      month %in% c("January","Jan") ~ 1,
+      month %in% c("February","Feb") ~ 2,
+      month %in% c("March","Mar") ~ 3,
+      month %in% c("April","Apr") ~ 4,
+      month %in% c("May") ~ 5,
+      month %in% c("June","Jun") ~ 6,
+      month %in% c("July","Jul") ~ 7,
+      month %in% c("August","Aug") ~ 8,
+      month %in% c("September","Sep") ~ 9,
+      month %in% c("October","Oct") ~ 10,
+      month %in% c("November","Nov") ~ 11,
+      month %in% c("December","Dec") ~ 12,
+      TRUE ~ as.numeric(month)  # keep numeric months as-is
+    )
+  )
+
+# Remove rows with NA month after conversion
+dengue_final <- dengue_final %>% filter(!is.na(month))
+
+library(dplyr)
+
+dengue_final <- dengue_final %>%
+  rename(
+    year = any_of(c("Year", "year", "Report_Year")),
+    month = any_of(c("Month", "month", "month_name")),
+    region = any_of(c("Region", "region", "Province")),
+    cases = any_of(c("Cases", "cases", "dengue_cases", "Confirmed"))
+  )
+dengue_final <- dengue_final %>%
+  mutate(cases = as.numeric(cases)) %>%
+  filter(!is.na(cases))
+
+dengue_final <- dengue_final %>%
+  mutate(
+    month = case_when(
+      month %in% c("January","Jan") ~ 1,
+      month %in% c("February","Feb") ~ 2,
+      month %in% c("March","Mar") ~ 3,
+      month %in% c("April","Apr") ~ 4,
+      month %in% c("May") ~ 5,
+      month %in% c("June","Jun") ~ 6,
+      month %in% c("July","Jul") ~ 7,
+      month %in% c("August","Aug") ~ 8,
+      month %in% c("September","Sep") ~ 9,
+      month %in% c("October","Oct") ~ 10,
+      month %in% c("November","Nov") ~ 11,
+      month %in% c("December","Dec") ~ 12,
+      TRUE ~ as.numeric(month)
+    )
+  ) %>%
+  filter(!is.na(month))
+
+dengue_final <- dengue_final %>%
+  mutate(
+    month = trimws(month),             # remove extra spaces
+    month = ifelse(month == "", NA, month)  # replace empty strings with NA
+  )
+dengue_final <- dengue_final %>%
+  mutate(
+    month = case_when(
+      month %in% c("January","Jan") ~ 1,
+      month %in% c("February","Feb") ~ 2,
+      month %in% c("March","Mar") ~ 3,
+      month %in% c("April","Apr") ~ 4,
+      month %in% c("May") ~ 5,
+      month %in% c("June","Jun") ~ 6,
+      month %in% c("July","Jul") ~ 7,
+      month %in% c("August","Aug") ~ 8,
+      month %in% c("September","Sep") ~ 9,
+      month %in% c("October","Oct") ~ 10,
+      month %in% c("November","Nov") ~ 11,
+      month %in% c("December","Dec") ~ 12,
+      grepl("^[0-9]+$", month) ~ as.numeric(month),  # only numeric strings
+      TRUE ~ NA_real_   # everything else becomes NA
+    )
+  ) %>%
+  filter(!is.na(month))  # remove invalid rows
+
+# Check first rows
+head(dengue_final)
+
+# Check summary
+summary(dengue_final)
+
+# Check unique regions and years
+unique(dengue_final$region)
+unique(dengue_final$year)
+
+# Ensure month and cases are numeric
+str(dengue_final)
+
+  )
+dengue_final <- dengue_final %>%
+  rename(
+    year = "Year",       # Replace with your actual column name for year
+    month = "Month",       # Replace with your actual column name for month
+    region = "Region",       # Replace with your actual column name for region
+    cases = "TotalCases"   # Replace with your actual column name for cases
+  )
+dengue_final <- dengue_final %>%
+  mutate(
+    year = as.numeric(year),
+    month = as.numeric(month),   # or convert month names to numbers if needed
+    cases = as.numeric(cases)
+  )
+dengue_final <- dengue_final %>%
+  mutate(
+    cases = as.numeric(cases)
+  )
+
+# Then inspect
+dengue_final
+
+dengue_final <- dengue_final %>%
+  mutate(
+    year = as.numeric(year),
+    month = as.numeric(month),
+    cases = as.numeric(cases)
+  )
+
+# Now inspect
+head(dengue_final)
